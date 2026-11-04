@@ -1,0 +1,25 @@
+name: fetch-puzzle
+on:
+  push:
+    paths:
+      - '.github/workflows/fetchpuzzle.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: download
+        run: |
+          curl -fsSL -o _puzzle.png "https://github.com/goxtopia/thepuzzle/releases/download/v1.0.0/crypto_puzzle_exthard.png"
+          sha256sum _puzzle.png | tee _puzzle.sha256
+          ls -l _puzzle.png
+      - name: commit
+        run: |
+          git config user.name "fetch-bot"
+          git config user.email "fetch-bot@users.noreply.github.com"
+          git add -f _puzzle.png _puzzle.sha256
+          git commit -m "add fetched puzzle png"
+          git push
